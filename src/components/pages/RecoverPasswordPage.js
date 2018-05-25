@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 
+import AuthAPI from '../../api/auth';
 import Helpers from '../../assets/helpers';
 
+const authAPI = new AuthAPI();
 const helpers = new Helpers();
 
+const { changePassword } = authAPI;
 const { splitQueryParams } = helpers;
 
 class RecoverPasswordPage extends Component {
@@ -29,8 +32,19 @@ class RecoverPasswordPage extends Component {
     this.setState(o);
   }
 
+  handleRes = (results) => {
+    console.log('RESULTS', results);
+  }
+
   submit = () => {
     console.log('SUBMIT');
+    const {
+      id,
+      password,
+      token,
+    } = this.state;
+
+    changePassword(id, password, token, this.handleRes);
   }
 
   render() {
