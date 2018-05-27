@@ -46,6 +46,9 @@ const postNoAuth = (url, body, cb) => {
 };
 
 const post = (url, token, body, cb) => {
+  console.log('URL', url);
+  console.log('TOKEN', token);
+  console.log('BODY', body);
   fetch(url, {
     credentials: 'include',
     headers: {

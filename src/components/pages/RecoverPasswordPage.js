@@ -16,7 +16,7 @@ class RecoverPasswordPage extends Component {
 
     // remove the question mark and only show the actual params
     const queryParams = props.location.search.split('?')[1];
-    const { id, token } = splitQueryParams(queryParams);
+    const { id, token } = queryParams ? splitQueryParams(queryParams) : {};
 
     this.state = {
       confirmPassword: '',

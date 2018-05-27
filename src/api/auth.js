@@ -1,44 +1,36 @@
-import { post } from './main';
+import { postNoAuth } from './main';
 import data from '../assets/data';
 
 const api = data.apiURL;
 
 class AuthAPI {
-  checkFBToken = (user, cb) => {
-    return fetch(`${api}/fblogin`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(user),
+  checkFBToken = (user, cb) => fetch(`${api}/fblogin`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .then((results) => {
+      cb(results);
     })
-      .then((response) => {
-        return response.json();
-      })
-      .then((results) => {
-        cb(results);
-      })
-      .catch((err) => {
-        console.error('CHECK FB TOKEN ERROR', err);
-      });
-  };
+    .catch((err) => {
+      console.error('CHECK FB TOKEN ERROR', err);
+    });
 
-  createUser = (user, cb, cbError) => {
-    return fetch(`${api}/signup`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(user),
+  createUser = (user, cb, cbError) => fetch(`${api}/signup`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(user),
+  })
+    .then((response) => response.json())
+    .then((results) => {
+      cb(results);
     })
-      .then((response) => {
-        return response.json();
-      })
-      .then((results) => {
-        cb(results);
-      })
-      .catch(err => cbError('An account with this email already exists.', false));
-  };
+    .catch(err => cbError('An account with this email already exists.', false));
 
   changePassword = (id, password, token, cb) => {
     const body = {
@@ -48,7 +40,7 @@ class AuthAPI {
     };
     const url = `${api}/change_password`;
 
-    return post(url, token, body, cb)
+    return postNoAuth(url, body, cb);
   };
 
   registerFB = (user, cb) => fetch(`${api}/signup_fb`, {
@@ -58,9 +50,7 @@ class AuthAPI {
     method: 'POST',
     body: JSON.stringify(user),
   })
-    .then((response) => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then((results) => {
       cb(results);
     })
@@ -72,7 +62,7 @@ class AuthAPI {
     const client = new XMLHttpRequest();
     client.open('GET', `http://api.zippopotam.us/us/${zipCode}`, true);
     client.onreadystatechange = function () {
-      if (client.readyState == 4) {
+      if (Number(client.readyState) === 4) {
         cb(client.responseText);
       }
     };
