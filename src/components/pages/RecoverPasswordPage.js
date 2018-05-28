@@ -3,6 +3,9 @@ import { Redirect } from 'react-router-dom';
 
 import AuthAPI from '../../api/auth';
 import Helpers from '../../assets/helpers';
+import ErrorMessage from '../shared/ErrorMessage';
+import SuccessMessage from '../shared/SuccessMessage';
+import Button from '../shared/Button';
 
 const authAPI = new AuthAPI();
 const helpers = new Helpers();
@@ -20,7 +23,10 @@ class RecoverPasswordPage extends Component {
 
     this.state = {
       confirmPassword: '',
+      error: null,
       id,
+      loading: false,
+      success: false,
       token,
       password: '',
     };
@@ -33,26 +39,66 @@ class RecoverPasswordPage extends Component {
   }
 
   handleRes = (results) => {
-    console.log('RESULTS', results);
+    const { error } = results;
+    if (error) {
+      this.setState({
+        error,
+        loading: false,
+      });
+    } else {
+      this.setState({
+        confirmPassword: '',
+        loading: false,
+        password: '',
+        success: true,
+      });
+    }
   }
 
   submit = () => {
-    console.log('SUBMIT');
     const {
       id,
       password,
       token,
     } = this.state;
 
-    changePassword(id, password, token, this.handleRes);
+    this.setState({
+      error: null,
+      loading: true,
+      success: false,
+    }, () => {
+      changePassword(id, password, token, this.handleRes);
+    });
   }
 
   render() {
-    const { id, token } = this.state;
+    const {
+      confirmPassword,
+      error,
+      id,
+      loading,
+      password,
+      success,
+      token,
+    } = this.state;
 
     if (!id || !token) {
       return <Redirect to="/" />;
     }
+
+    const errorMessage = error ?
+      (
+        <ErrorMessage
+          message={error}
+        />
+      ) : null;
+
+    const successMessage = success ?
+      (
+        <SuccessMessage
+          message="Password updated. Please open the app to login."
+        />
+      ) : null;
 
     return (
       <div className="RecoverPasswordPage">
@@ -64,7 +110,7 @@ class RecoverPasswordPage extends Component {
             <input
               onChange={evt => this.handleChange(evt, 'password')}
               type="password"
-              value={this.state.password}
+              value={password}
             />
           </div>
           <div>
@@ -74,16 +120,18 @@ class RecoverPasswordPage extends Component {
             <input
               onChange={evt => this.handleChange(evt, 'confirmPassword')}
               type="password"
-              value={this.state.confirmPassword}
+              value={confirmPassword}
             />
           </div>
           <div>
-            <button
+            <Button
+              disabled={password !== confirmPassword || password.trim().length < 5}
+              loading={loading}
               onClick={this.submit}
-            >
-              Submit
-            </button>
+              title="Submit"
+            />
           </div>
+          {errorMessage || successMessage}
         </div>
       </div>
     );
